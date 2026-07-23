@@ -1,118 +1,807 @@
 {
-  "generated_at": "2026-07-23T08:55:17+00:00",
-  "generated_at_kst": "2026-07-23 17:55 KST",
+  "generated_at": "2026-07-23T08:59:36+00:00",
+  "generated_at_kst": "2026-07-23 17:59 KST",
   "source": "Yahoo Finance",
-  "quotes": {},
+  "quotes": {
+    "SP500": {
+      "label": "S&P 500",
+      "ticker": "^GSPC",
+      "unit": "",
+      "decimals": 2,
+      "value": 7498.959961,
+      "change_pct": -0.14,
+      "week_pct": -0.97,
+      "spark": [
+        7515.3398,
+        7543.5898,
+        7572.3999,
+        7533.77,
+        7457.6899,
+        7443.2798,
+        7509.2002,
+        7498.96
+      ],
+      "asof": "2026-07-22"
+    },
+    "DOW": {
+      "label": "Dow Jones",
+      "ticker": "^DJI",
+      "unit": "",
+      "decimals": 2,
+      "value": 52218.578125,
+      "change_pct": -0.01,
+      "week_pct": -0.84,
+      "spark": [
+        52498.6406,
+        52508.2695,
+        52658.6406,
+        52552.9688,
+        52146.4219,
+        51839.2617,
+        52224.6406,
+        52218.5781
+      ],
+      "asof": "2026-07-22"
+    },
+    "NASDAQ": {
+      "label": "Nasdaq Comp.",
+      "ticker": "^IXIC",
+      "unit": "",
+      "decimals": 2,
+      "value": 25690.900391,
+      "change_pct": -0.57,
+      "week_pct": -2.2,
+      "spark": [
+        25873.1797,
+        26107.0098,
+        26269.2305,
+        25881.9492,
+        25520.2402,
+        25508.0703,
+        25837.2109,
+        25690.9004
+      ],
+      "asof": "2026-07-22"
+    },
+    "RUSSELL2000": {
+      "label": "Russell 2000",
+      "ticker": "^RUT",
+      "unit": "",
+      "decimals": 2,
+      "value": 2959.939941,
+      "change_pct": -0.92,
+      "week_pct": -0.55,
+      "spark": [
+        2953.1699,
+        2964.76,
+        2976.26,
+        2974.5701,
+        2962.22,
+        2942.4299,
+        2987.3999,
+        2959.9399
+      ],
+      "asof": "2026-07-22"
+    },
+    "DXY": {
+      "label": "Dollar Index (DXY)",
+      "ticker": "DX-Y.NYB",
+      "unit": "",
+      "decimals": 2,
+      "value": 101.154999,
+      "change_pct": 0.01,
+      "week_pct": 0.42,
+      "spark": [
+        100.94,
+        100.5,
+        100.73,
+        100.75,
+        100.99,
+        101.18,
+        101.14,
+        101.155
+      ],
+      "asof": "2026-07-23"
+    },
+    "USDKRW": {
+      "label": "USD / KRW",
+      "ticker": "KRW=X",
+      "unit": "₩",
+      "decimals": 1,
+      "value": 1470.569946,
+      "change_pct": -0.62,
+      "week_pct": -1.05,
+      "spark": [
+        1497.7,
+        1487.88,
+        1486.2,
+        1478.85,
+        1487.39,
+        1475.01,
+        1479.72,
+        1470.5699
+      ],
+      "asof": "2026-07-23"
+    },
+    "EURUSD": {
+      "label": "EUR / USD",
+      "ticker": "EURUSD=X",
+      "unit": "",
+      "decimals": 4,
+      "value": 1.141422,
+      "change_pct": 0.09,
+      "week_pct": -0.49,
+      "spark": [
+        1.1384,
+        1.1425,
+        1.147,
+        1.1445,
+        1.1428,
+        1.1418,
+        1.1404,
+        1.1414
+      ],
+      "asof": "2026-07-23"
+    },
+    "USDJPY": {
+      "label": "USD / JPY",
+      "ticker": "JPY=X",
+      "unit": "",
+      "decimals": 2,
+      "value": 163.347,
+      "change_pct": 0.1,
+      "week_pct": 0.79,
+      "spark": [
+        162.429,
+        162.187,
+        162.072,
+        162.376,
+        162.512,
+        162.487,
+        163.186,
+        163.347
+      ],
+      "asof": "2026-07-23"
+    },
+    "USDCNY": {
+      "label": "USD / CNY",
+      "ticker": "CNY=X",
+      "unit": "",
+      "decimals": 4,
+      "value": 6.7696,
+      "change_pct": 0.06,
+      "week_pct": 0.02,
+      "spark": [
+        6.7795,
+        6.77,
+        6.7682,
+        6.7725,
+        6.7725,
+        6.7725,
+        6.7656,
+        6.7696
+      ],
+      "asof": "2026-07-23"
+    },
+    "WTI": {
+      "label": "WTI Crude",
+      "ticker": "CL=F",
+      "unit": "$",
+      "decimals": 2,
+      "value": 89.25,
+      "change_pct": 2.79,
+      "week_pct": 13.05,
+      "spark": [
+        79.34,
+        79.6,
+        78.95,
+        82.49,
+        83.23,
+        84.91,
+        86.83,
+        89.25
+      ],
+      "asof": "2026-07-23"
+    },
+    "BRENT": {
+      "label": "Brent Crude",
+      "ticker": "BZ=F",
+      "unit": "$",
+      "decimals": 2,
+      "value": 86.300003,
+      "change_pct": -8.26,
+      "week_pct": 2.46,
+      "spark": [
+        84.73,
+        84.95,
+        84.23,
+        88.1,
+        89.22,
+        91.01,
+        94.07,
+        86.3
+      ],
+      "asof": "2026-07-23"
+    },
+    "GOLD": {
+      "label": "Gold",
+      "ticker": "GC=F",
+      "unit": "$",
+      "decimals": 1,
+      "value": 4093.100098,
+      "change_pct": -1.3,
+      "week_pct": 2.7,
+      "spark": [
+        4061.1001,
+        4044.0,
+        3985.6001,
+        4012.7,
+        4010.3,
+        4071.1001,
+        4146.8999,
+        4093.1001
+      ],
+      "asof": "2026-07-23"
+    },
+    "SILVER": {
+      "label": "Silver",
+      "ticker": "SI=F",
+      "unit": "$",
+      "decimals": 2,
+      "value": 59.060001,
+      "change_pct": -1.6,
+      "week_pct": 5.66,
+      "spark": [
+        58.772,
+        57.11,
+        55.898,
+        56.038,
+        56.802,
+        58.835,
+        60.019,
+        59.06
+      ],
+      "asof": "2026-07-23"
+    },
+    "COPPER": {
+      "label": "Copper",
+      "ticker": "HG=F",
+      "unit": "$",
+      "decimals": 3,
+      "value": 6.449,
+      "change_pct": -0.03,
+      "week_pct": 2.43,
+      "spark": [
+        6.33,
+        6.2935,
+        6.296,
+        6.22,
+        6.299,
+        6.511,
+        6.451,
+        6.449
+      ],
+      "asof": "2026-07-23"
+    },
+    "NATGAS": {
+      "label": "Natural Gas",
+      "ticker": "NG=F",
+      "unit": "$",
+      "decimals": 3,
+      "value": 2.929,
+      "change_pct": 0.14,
+      "week_pct": 2.48,
+      "spark": [
+        2.904,
+        2.924,
+        2.858,
+        2.911,
+        2.86,
+        2.865,
+        2.925,
+        2.929
+      ],
+      "asof": "2026-07-23"
+    },
+    "US10Y": {
+      "label": "US 10Y",
+      "ticker": "^TNX",
+      "unit": "%",
+      "decimals": 3,
+      "value": 4.657,
+      "change_pct": 0.63,
+      "week_pct": 2.46,
+      "spark": [
+        4.609,
+        4.585,
+        4.545,
+        4.569,
+        4.541,
+        4.598,
+        4.628,
+        4.657
+      ],
+      "asof": "2026-07-22"
+    },
+    "KOSPI": {
+      "label": "KOSPI",
+      "ticker": "^KS11",
+      "unit": "",
+      "decimals": 2,
+      "value": 7096.890137,
+      "change_pct": 4.4,
+      "week_pct": -2.57,
+      "spark": [
+        6806.9302,
+        6856.8301,
+        7284.4102,
+        6820.6001,
+        6516.27,
+        6747.9502,
+        6797.7002,
+        7096.8901
+      ],
+      "asof": "2026-07-23"
+    },
+    "KOSDAQ": {
+      "label": "KOSDAQ",
+      "ticker": "^KQ11",
+      "unit": "",
+      "decimals": 2,
+      "value": 790.280029,
+      "change_pct": 5.22,
+      "week_pct": -4.72,
+      "spark": [
+        799.36,
+        783.98,
+        829.43,
+        791.84,
+        749.64,
+        753.34,
+        751.09,
+        790.28
+      ],
+      "asof": "2026-07-23"
+    },
+    "KOSPI200": {
+      "label": "KOSPI 200",
+      "ticker": "^KS200",
+      "unit": "",
+      "decimals": 2,
+      "value": 1126.329956,
+      "change_pct": 4.26,
+      "week_pct": -5.88,
+      "spark": [
+        1158.37,
+        1169.73,
+        1196.6899,
+        1078.78,
+        1092.23,
+        1163.9,
+        1080.36,
+        1126.33
+      ],
+      "asof": "2026-07-23"
+    },
+    "KOSDAQ150": {
+      "label": "KOSDAQ 150*",
+      "ticker": "229200.KS",
+      "unit": "",
+      "decimals": 2,
+      "value": 13400.0,
+      "change_pct": 6.99,
+      "week_pct": -6.59,
+      "spark": [
+        13800.0,
+        13410.0,
+        14345.0,
+        13580.0,
+        12610.0,
+        12650.0,
+        12525.0,
+        13400.0
+      ],
+      "asof": "2026-07-23"
+    }
+  },
   "groups": {
-    "global_indices": [],
-    "fx_dollar": [],
-    "commodities": [],
-    "global_bonds": [],
-    "korea_indices": []
+    "global_indices": [
+      "SP500",
+      "DOW",
+      "NASDAQ",
+      "RUSSELL2000"
+    ],
+    "fx_dollar": [
+      "DXY",
+      "USDKRW",
+      "EURUSD",
+      "USDJPY",
+      "USDCNY"
+    ],
+    "commodities": [
+      "WTI",
+      "BRENT",
+      "GOLD",
+      "SILVER",
+      "COPPER",
+      "NATGAS"
+    ],
+    "global_bonds": [
+      "US10Y"
+    ],
+    "korea_indices": [
+      "KOSPI",
+      "KOSDAQ",
+      "KOSPI200",
+      "KOSDAQ150"
+    ]
   },
   "series": {
-    "global_indices": {},
-    "korea_indices": {}
+    "global_indices": {
+      "dates": [
+        "2026-07-14",
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-17",
+        "2026-07-20",
+        "2026-07-21",
+        "2026-07-22"
+      ],
+      "indexed": {
+        "S&P 500": [
+          100.0,
+          100.382,
+          99.87,
+          98.861,
+          98.67,
+          99.544,
+          99.408
+        ],
+        "Dow Jones": [
+          100.0,
+          100.286,
+          100.085,
+          99.311,
+          98.726,
+          99.46,
+          99.448
+        ],
+        "Nasdaq Comp.": [
+          100.0,
+          100.621,
+          99.138,
+          97.752,
+          97.706,
+          98.967,
+          98.406
+        ],
+        "Russell 2000": [
+          100.0,
+          100.388,
+          100.331,
+          99.914,
+          99.247,
+          100.764,
+          99.837
+        ]
+      },
+      "raw": {
+        "S&P 500": [
+          7543.59,
+          7572.4,
+          7533.77,
+          7457.69,
+          7443.28,
+          7509.2,
+          7498.96
+        ],
+        "Dow Jones": [
+          52508.27,
+          52658.641,
+          52552.969,
+          52146.422,
+          51839.262,
+          52224.641,
+          52218.578
+        ],
+        "Nasdaq Comp.": [
+          26107.01,
+          26269.23,
+          25881.949,
+          25520.24,
+          25508.07,
+          25837.211,
+          25690.9
+        ],
+        "Russell 2000": [
+          2964.76,
+          2976.26,
+          2974.57,
+          2962.22,
+          2942.43,
+          2987.4,
+          2959.94
+        ]
+      }
+    },
+    "korea_indices": {
+      "dates": [
+        "2026-07-14",
+        "2026-07-15",
+        "2026-07-16",
+        "2026-07-20",
+        "2026-07-21",
+        "2026-07-22",
+        "2026-07-23"
+      ],
+      "indexed": {
+        "KOSPI": [
+          100.0,
+          106.236,
+          99.472,
+          95.033,
+          98.412,
+          99.138,
+          103.501
+        ],
+        "KOSDAQ": [
+          100.0,
+          105.797,
+          101.003,
+          95.62,
+          96.092,
+          95.805,
+          100.804
+        ],
+        "KOSPI 200": [
+          100.0,
+          106.562,
+          98.913,
+          null,
+          null,
+          null,
+          103.122
+        ],
+        "KOSDAQ 150*": [
+          100.0,
+          106.972,
+          101.268,
+          94.034,
+          94.333,
+          93.4,
+          99.925
+        ]
+      },
+      "raw": {
+        "KOSPI": [
+          6856.83,
+          7284.41,
+          6820.6,
+          6516.27,
+          6747.95,
+          6797.7,
+          7096.89
+        ],
+        "KOSDAQ": [
+          783.98,
+          829.43,
+          791.84,
+          749.64,
+          753.34,
+          751.09,
+          790.28
+        ],
+        "KOSPI 200": [
+          1092.23,
+          1163.9,
+          1080.36,
+          null,
+          null,
+          null,
+          1126.33
+        ],
+        "KOSDAQ 150*": [
+          13410.0,
+          14345.0,
+          13580.0,
+          12610.0,
+          12650.0,
+          12525.0,
+          13400.0
+        ]
+      }
+    }
   },
-  "yield_curves": {},
+  "yield_curves": {
+    "US": {
+      "maturities": [
+        "3M",
+        "5Y",
+        "10Y",
+        "30Y"
+      ],
+      "today": [
+        3.745,
+        4.407,
+        4.657,
+        5.147
+      ],
+      "week_ago": [
+        3.688,
+        4.255,
+        4.545,
+        5.083
+      ],
+      "month_ago": [
+        3.68,
+        4.287,
+        4.509,
+        4.947
+      ],
+      "asof": "2026-07-22"
+    }
+  },
   "sectors": {
-    "US": [],
-    "KR": []
+    "US": [
+      {
+        "name": "Technology",
+        "ticker": "XLK",
+        "price": 180.27,
+        "change_pct": -0.28,
+        "week_pct": -0.72
+      },
+      {
+        "name": "Financials",
+        "ticker": "XLF",
+        "price": 56.05,
+        "change_pct": -0.11,
+        "week_pct": -0.9
+      },
+      {
+        "name": "Health Care",
+        "ticker": "XLV",
+        "price": 159.43,
+        "change_pct": -0.51,
+        "week_pct": 0.72
+      },
+      {
+        "name": "Cons. Discretionary",
+        "ticker": "XLY",
+        "price": 114.02,
+        "change_pct": -0.74,
+        "week_pct": -2.55
+      },
+      {
+        "name": "Communication Svcs",
+        "ticker": "XLC",
+        "price": 109.2,
+        "change_pct": -0.75,
+        "week_pct": -3.69
+      },
+      {
+        "name": "Industrials",
+        "ticker": "XLI",
+        "price": 178.85,
+        "change_pct": 0.11,
+        "week_pct": -0.67
+      },
+      {
+        "name": "Cons. Staples",
+        "ticker": "XLP",
+        "price": 84.38,
+        "change_pct": 0.38,
+        "week_pct": 1.09
+      },
+      {
+        "name": "Energy",
+        "ticker": "XLE",
+        "price": 59.2,
+        "change_pct": 1.2,
+        "week_pct": 4.78
+      },
+      {
+        "name": "Utilities",
+        "ticker": "XLU",
+        "price": 45.93,
+        "change_pct": 2.25,
+        "week_pct": 1.57
+      },
+      {
+        "name": "Materials",
+        "ticker": "XLB",
+        "price": 50.82,
+        "change_pct": 1.44,
+        "week_pct": 0.63
+      },
+      {
+        "name": "Real Estate",
+        "ticker": "XLRE",
+        "price": 45.01,
+        "change_pct": -0.42,
+        "week_pct": 1.01
+      }
+    ],
+    "KR": [
+      {
+        "name": "Semiconductors",
+        "ticker": "091160.KS",
+        "price": 132000.0,
+        "change_pct": 3.99,
+        "week_pct": -9.65
+      },
+      {
+        "name": "Banks",
+        "ticker": "091170.KS",
+        "price": 15900.0,
+        "change_pct": -0.06,
+        "week_pct": -3.64
+      },
+      {
+        "name": "Autos",
+        "ticker": "091180.KS",
+        "price": 30980.0,
+        "change_pct": 3.84,
+        "week_pct": 3.79
+      },
+      {
+        "name": "Securities",
+        "ticker": "102970.KS",
+        "price": 20835.0,
+        "change_pct": 3.4,
+        "week_pct": -5.21
+      },
+      {
+        "name": "Energy & Chem.",
+        "ticker": "117460.KS",
+        "price": 13890.0,
+        "change_pct": 8.35,
+        "week_pct": 5.95
+      },
+      {
+        "name": "Transportation",
+        "ticker": "140710.KS",
+        "price": 6385.0,
+        "change_pct": 4.16,
+        "week_pct": 3.99
+      },
+      {
+        "name": "EV Battery",
+        "ticker": "305720.KS",
+        "price": 14025.0,
+        "change_pct": 9.53,
+        "week_pct": 1.45
+      },
+      {
+        "name": "Insurance",
+        "ticker": "140700.KS",
+        "price": 19205.0,
+        "change_pct": 1.03,
+        "week_pct": -1.61
+      },
+      {
+        "name": "Media & Telecom",
+        "ticker": "266360.KS",
+        "price": 10210.0,
+        "change_pct": 4.83,
+        "week_pct": 4.61
+      },
+      {
+        "name": "Machinery/Equip.",
+        "ticker": "102960.KS",
+        "price": 13990.0,
+        "change_pct": 7.78,
+        "week_pct": 3.86
+      }
+    ]
   },
   "errors": [
-    "no data for 091160.KS",
-    "no data for 091170.KS",
-    "no data for 091180.KS",
-    "no data for 102960.KS",
-    "no data for 102970.KS",
-    "no data for 117460.KS",
-    "no data for 140700.KS",
-    "no data for 140710.KS",
-    "no data for 229200.KS",
-    "no data for 266360.KS",
-    "no data for 305720.KS",
-    "no data for BZ=F",
-    "no data for CL=F",
-    "no data for CNY=X",
-    "no data for DX-Y.NYB",
-    "no data for EURUSD=X",
-    "no data for GC=F",
-    "no data for HG=F",
-    "no data for JPY=X",
-    "no data for KRW=X",
-    "no data for NG=F",
-    "no data for SI=F",
-    "no data for XLB",
-    "no data for XLC",
-    "no data for XLE",
-    "no data for XLF",
-    "no data for XLI",
-    "no data for XLK",
-    "no data for XLP",
-    "no data for XLRE",
-    "no data for XLU",
-    "no data for XLV",
-    "no data for XLY",
     "no data for ^DE10Y",
-    "no data for ^DJI",
-    "no data for ^FVX",
     "no data for ^GB10Y",
-    "no data for ^GSPC",
-    "no data for ^IRX",
-    "no data for ^IXIC",
     "no data for ^JP10Y",
-    "no data for ^KQ11",
     "no data for ^KR10Y",
-    "no data for ^KS11",
-    "no data for ^KS200",
-    "no data for ^RUT",
-    "no data for ^TNX",
-    "no data for ^TYX",
-    "S&P 500 (^GSPC): no data",
-    "Dow Jones (^DJI): no data",
-    "Nasdaq Comp. (^IXIC): no data",
-    "Russell 2000 (^RUT): no data",
-    "Dollar Index (DXY) (DX-Y.NYB): no data",
-    "USD / KRW (KRW=X): no data",
-    "EUR / USD (EURUSD=X): no data",
-    "USD / JPY (JPY=X): no data",
-    "USD / CNY (CNY=X): no data",
-    "WTI Crude (CL=F): no data",
-    "Brent Crude (BZ=F): no data",
-    "Gold (GC=F): no data",
-    "Silver (SI=F): no data",
-    "Copper (HG=F): no data",
-    "Natural Gas (NG=F): no data",
-    "US 10Y (^TNX): no data",
     "Germany 10Y (^DE10Y): no data",
     "Japan 10Y (^JP10Y): no data",
     "UK 10Y (^GB10Y): no data",
-    "Korea 10Y (^KR10Y): no data",
-    "KOSPI (^KS11): no data",
-    "KOSDAQ (^KQ11): no data",
-    "KOSPI 200 (^KS200): no data",
-    "KOSDAQ 150* (229200.KS): no data",
-    "sector Technology (XLK): no data",
-    "sector Financials (XLF): no data",
-    "sector Health Care (XLV): no data",
-    "sector Cons. Discretionary (XLY): no data",
-    "sector Communication Svcs (XLC): no data",
-    "sector Industrials (XLI): no data",
-    "sector Cons. Staples (XLP): no data",
-    "sector Energy (XLE): no data",
-    "sector Utilities (XLU): no data",
-    "sector Materials (XLB): no data",
-    "sector Real Estate (XLRE): no data",
-    "sector Semiconductors (091160.KS): no data",
-    "sector Banks (091170.KS): no data",
-    "sector Autos (091180.KS): no data",
-    "sector Securities (102970.KS): no data",
-    "sector Energy & Chem. (117460.KS): no data",
-    "sector Transportation (140710.KS): no data",
-    "sector EV Battery (305720.KS): no data",
-    "sector Insurance (140700.KS): no data",
-    "sector Media & Telecom (266360.KS): no data",
-    "sector Machinery/Equip. (102960.KS): no data",
-    "US yield curve: no data"
+    "Korea 10Y (^KR10Y): no data"
   ]
 }
