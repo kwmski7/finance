@@ -24,7 +24,7 @@ KOSDAQ / KOSPI 200 / KOSDAQ 150, yield curves with trend, and US &amp; Korean se
 maps. Data is gathered server-side by a GitHub Action and rendered as an
 interactive page. Hit **Refresh** to pull the latest numbers on demand.
 
-**▶ Live dashboard:** https://kwmski7.github.io/kwmski7/
+**▶ Live dashboard:** https://kwmski7.github.io/finance/
 
 Setup &amp; how it works: [`DASHBOARD.md`](DASHBOARD.md).
 

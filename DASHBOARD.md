@@ -6,7 +6,7 @@ page can't fetch these sources directly — most block cross-origin browser
 requests), and published to GitHub Pages. A **Refresh** button on the page asks
 the Action to re-gather and re-publish, then reloads when it's done.
 
-**Live page:** https://kwmski7.github.io/kwmski7/
+**Live page:** https://kwmski7.github.io/finance/
 
 ## What it shows
 
