@@ -1,6 +1,9 @@
 # Data pipeline for the daily economic dashboard.
-# Pinned to reasonably recent, stable releases; refreshed by the GitHub Action.
-yfinance==0.2.51
+# yfinance must stay recent: Yahoo changes its API often and old pins silently
+# return empty data. curl_cffi lets yfinance impersonate a real browser, which
+# is what gets requests past Yahoo's bot detection on CI/datacenter IPs.
+yfinance==1.5.1
+curl_cffi==0.15.0
 pandas==2.2.3
 numpy==2.1.3
 requests==2.32.3

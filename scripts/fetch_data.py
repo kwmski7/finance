@@ -30,6 +30,16 @@ except Exception as exc:  # pragma: no cover - import guard
     print(f"FATAL: yfinance import failed: {exc}", file=sys.stderr)
     raise
 
+# A browser-impersonating session is what gets requests past Yahoo's bot
+# detection on CI/datacenter IPs (GitHub Actions). Without it, Yahoo returns
+# empty responses and every ticker looks like "no data".
+try:
+    from curl_cffi import requests as _cffi_requests
+    SESSION = _cffi_requests.Session(impersonate="chrome")
+except Exception as exc:  # pragma: no cover - optional dependency
+    print(f"WARN: curl_cffi session unavailable ({exc}); using default session", file=sys.stderr)
+    SESSION = None
+
 KST = timezone(timedelta(hours=9))
 ERRORS: list[str] = []
 
@@ -74,6 +84,7 @@ def download_history(tickers: list[str]) -> dict[str, pd.Series]:
         batch = yf.download(
             tickers, period=config.HISTORY_PERIOD, interval="1d",
             auto_adjust=False, progress=False, threads=True, group_by="ticker",
+            session=SESSION,
         )
     except Exception as exc:
         note_error(f"batch download failed ({exc}); falling back to per-ticker")
@@ -90,7 +101,8 @@ def download_history(tickers: list[str]) -> dict[str, pd.Series]:
     for t in missing:
         try:
             df = yf.download(t, period=config.HISTORY_PERIOD, interval="1d",
-                             auto_adjust=False, progress=False, threads=False)
+                             auto_adjust=False, progress=False, threads=False,
+                             session=SESSION)
             s = extract(df, t)
             if s is not None:
                 closes[t] = s
