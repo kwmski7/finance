@@ -1,0 +1,82 @@
+name: Refresh market data
+
+# Triggered on demand: from the Actions tab ("Run workflow") or from the
+# dashboard's Refresh button (which calls the workflow_dispatch API).
+on:
+  workflow_dispatch:
+  # Daily 9am KST == 00:00 UTC. Uncomment to also auto-refresh every morning.
+  # schedule:
+  #   - cron: "0 0 * * *"
+
+# Needed to publish GitHub Pages and to commit the data snapshot back.
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Let a run finish rather than cancelling a mid-flight Pages deploy.
+concurrency:
+  group: market-refresh
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Gather market data
+        env:
+          # Optional: add a free Bank of Korea ECOS key as a repo secret named
+          # ECOS_API_KEY to enable the Korean government bond yield curve.
+          ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+        run: python scripts/fetch_data.py
+
+      - name: Assemble the site
+        run: |
+          mkdir -p site
+          cp web/index.html site/index.html
+
+      - name: Commit data snapshot
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No data changes to commit."
+          else
+            git commit -m "chore(data): refresh market snapshot [skip ci]"
+            for i in 1 2 3; do
+              git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+              git push origin "HEAD:${GITHUB_REF_NAME}" && break || sleep $((i*3))
+            done
+          fi
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4

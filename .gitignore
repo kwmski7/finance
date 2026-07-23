@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build output for GitHub Pages (assembled in CI, not committed)
+site/
+
+# Local scratch
+*.log
+.DS_Store

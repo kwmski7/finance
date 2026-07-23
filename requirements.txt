@@ -1,0 +1,6 @@
+# Data pipeline for the daily economic dashboard.
+# Pinned to reasonably recent, stable releases; refreshed by the GitHub Action.
+yfinance==0.2.51
+pandas==2.2.3
+numpy==2.1.3
+requests==2.32.3

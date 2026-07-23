@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Market Dashboard · Global & Korea</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+<style>
+  /* ---- Palette (validated dataviz reference instance) ---- */
+  :root{
+    color-scheme: light;
+    --plane:#f9f9f7; --surface:#fcfcfb; --border:rgba(11,11,11,.10);
+    --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781; --grid:#e1e0d9; --axis:#c3c2b7;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+    --up:#d03b3b; --down:#2a78d6; --neutral:#c3c2b7;   /* Korean convention: red=up, blue=down */
+    --up-soft:rgba(208,59,59,.12); --down-soft:rgba(42,120,214,.12);
+    --card-radius:14px;
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --plane:#0d0d0d; --surface:#1a1a19; --border:rgba(255,255,255,.10);
+    --ink:#fff; --ink-2:#c3c2b7; --muted:#898781; --grid:#2c2c2a; --axis:#383835;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    --up:#e66767; --down:#3987e5; --neutral:#383835;
+    --up-soft:rgba(230,103,103,.15); --down-soft:rgba(57,135,229,.15);
+  }
+  /* Follow the OS preference until the viewer picks a theme (data-theme wins both ways). */
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --plane:#0d0d0d; --surface:#1a1a19; --border:rgba(255,255,255,.10);
+      --ink:#fff; --ink-2:#c3c2b7; --muted:#898781; --grid:#2c2c2a; --axis:#383835;
+      --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+      --up:#e66767; --down:#3987e5; --neutral:#383835;
+      --up-soft:rgba(230,103,103,.15); --down-soft:rgba(57,135,229,.15);
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--plane);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    line-height:1.45;-webkit-font-smoothing:antialiased;}
+  a{color:var(--s1)}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 18px 64px}
+
+  header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 20px;
+    padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:22px}
+  header h1{font-size:1.5rem;margin:0;letter-spacing:-.01em}
+  header .sub{color:var(--ink-2);font-size:.9rem;margin-top:3px}
+  .spacer{flex:1 1 auto}
+  .btn{appearance:none;border:1px solid var(--border);background:var(--surface);color:var(--ink);
+    border-radius:10px;padding:9px 14px;font-size:.9rem;font-weight:600;cursor:pointer;
+    display:inline-flex;align-items:center;gap:8px;transition:.12s}
+  .btn:hover{border-color:var(--axis)}
+  .btn.primary{background:var(--s1);border-color:var(--s1);color:#fff}
+  .btn.primary:hover{filter:brightness(1.06)}
+  .btn[disabled]{opacity:.55;cursor:default}
+  #status{font-size:.82rem;color:var(--ink-2);min-height:1.1em}
+  #status .dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+    background:var(--s3);margin-right:6px;vertical-align:middle}
+  #status.err{color:var(--up)}
+
+  section{margin:30px 0}
+  h2{font-size:1.12rem;margin:0 0 4px;letter-spacing:-.01em}
+  .sec-note{color:var(--muted);font-size:.82rem;margin:0 0 14px}
+  h3{font-size:.95rem;color:var(--ink-2);margin:20px 0 10px;font-weight:600}
+
+  .tiles{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(168px,1fr))}
+  .tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--card-radius);
+    padding:13px 14px;display:flex;flex-direction:column;gap:6px;min-height:104px}
+  .tile .name{font-size:.78rem;color:var(--ink-2);font-weight:600}
+  .tile .val{font-size:1.32rem;font-weight:650;letter-spacing:-.01em;
+    font-variant-numeric:tabular-nums}
+  .tile .row{display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .chg{font-size:.8rem;font-weight:700;font-variant-numeric:tabular-nums;
+    padding:2px 7px;border-radius:999px;white-space:nowrap}
+  .chg.up{color:var(--up);background:var(--up-soft)}
+  .chg.down{color:var(--down);background:var(--down-soft)}
+  .chg.flat{color:var(--muted);background:transparent}
+  .tile .spark{width:100%;height:26px;display:block}
+  .tile .foot{font-size:.68rem;color:var(--muted)}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--card-radius);
+    padding:14px 14px 6px}
+  .chart{width:100%;height:340px}
+  .grid2{display:grid;gap:16px;grid-template-columns:1fr}
+  @media(min-width:820px){.grid2{grid-template-columns:1fr 1fr}}
+
+  .legend-note{display:flex;gap:16px;flex-wrap:wrap;font-size:.78rem;color:var(--ink-2);
+    align-items:center;margin-top:10px}
+  .swatch{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+  #notes{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--s4);
+    border-radius:10px;padding:10px 14px;font-size:.8rem;color:var(--ink-2);margin-bottom:6px}
+  #notes summary{cursor:pointer;font-weight:600;color:var(--ink)}
+  #notes ul{margin:8px 0 2px;padding-left:18px}
+
+  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--border);
+    color:var(--muted);font-size:.78rem}
+
+  /* modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;
+    align-items:center;justify-content:center;padding:20px;z-index:50}
+  .modal-bg.open{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+    padding:22px;max-width:520px;width:100%}
+  .modal h3{margin:0 0 6px;color:var(--ink);font-size:1.05rem}
+  .modal p{font-size:.85rem;color:var(--ink-2);margin:8px 0}
+  .modal input{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--axis);
+    background:var(--plane);color:var(--ink);font-size:.9rem;font-family:inherit}
+  .modal ol{font-size:.83rem;color:var(--ink-2);padding-left:20px;margin:8px 0}
+  .modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+  code{background:var(--plane);border:1px solid var(--border);border-radius:5px;padding:1px 5px;font-size:.85em}
+  .skeleton{color:var(--muted);padding:24px;text-align:center;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Market Dashboard</h1>
+      <div class="sub">Global &amp; Korean economic indices · <span id="updated">loading…</span></div>
+    </div>
+    <div class="spacer"></div>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+      <div style="display:flex;gap:10px">
+        <button class="btn" id="theme-btn" title="Toggle light / dark">◐ Theme</button>
+        <button class="btn primary" id="refresh-btn">↻ Refresh data</button>
+      </div>
+      <div id="status"></div>
+    </div>
+  </header>
+
+  <details id="notes" hidden>
+    <summary>Data notes (<span id="notes-count">0</span>)</summary>
+    <ul id="notes-list"></ul>
+  </details>
+
+  <div id="app"><div class="skeleton">Loading market data…</div></div>
+
+  <footer>
+    <p><span class="swatch" style="background:var(--up)"></span>Up &nbsp;
+       <span class="swatch" style="background:var(--down)"></span>Down &nbsp;—&nbsp;
+       colored by the Korean market convention (red = rising, blue = falling). Every value is also labeled numerically.</p>
+    <p>Source: <span id="src">Yahoo Finance</span>. Levels are the latest available daily close and may lag real time; not investment advice.
+       KOSDAQ&nbsp;150 uses the KODEX&nbsp;150 ETF as a proxy; Korean sectors use KODEX sector ETFs.
+       <a href="#" id="forget-token" hidden>Forget saved token</a></p>
+  </footer>
+</div>
+
+<!-- token modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3>Connect a GitHub token to refresh</h3>
+    <p>This page is static, so the Refresh button asks GitHub Actions to re-gather the data.
+       That needs a fine-grained token with <b>Actions: read&amp;write</b> on this repository.
+       It is stored only in <b>this browser</b> (localStorage) and sent only to api.github.com.</p>
+    <ol>
+      <li>Open <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">Fine-grained tokens</a> → <b>Generate new token</b>.</li>
+      <li>Repository access → <b>Only select repositories</b> → this repo.</li>
+      <li>Permissions → Repository → <b>Actions</b> → <b>Read and write</b>.</li>
+      <li>Generate, copy, and paste below.</li>
+    </ol>
+    <input id="token-input" type="password" placeholder="github_pat_… or ghp_…" autocomplete="off">
+    <div class="actions">
+      <button class="btn" id="modal-cancel">Cancel</button>
+      <button class="btn primary" id="modal-save">Save &amp; refresh</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+// ---- repo / workflow wiring -------------------------------------------------
+const OWNER = "kwmski7", REPO = "kwmski7", WORKFLOW = "refresh.yml", REF = "main";
+const TOKEN_KEY = "gh_pat_dashboard";
+const $ = (s, r=document) => r.querySelector(s);
+
+let DATA = null;
+
+// ---- theme ------------------------------------------------------------------
+function effectiveTheme(){
+  const attr = document.documentElement.getAttribute("data-theme");
+  if (attr) return attr;
+  return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+function initTheme(){
+  const saved = localStorage.getItem("dash_theme");
+  if (saved) document.documentElement.setAttribute("data-theme", saved);
+  // Re-tint Plotly if the OS theme changes and the viewer hasn't chosen one.
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ()=>{
+    if (!document.documentElement.getAttribute("data-theme") && DATA) render(DATA);
+  });
+}
+function toggleTheme(){
+  const next = effectiveTheme() === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  localStorage.setItem("dash_theme", next);
+  if (DATA) render(DATA);            // Plotly colors are theme-dependent
+}
+function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+// ---- formatting -------------------------------------------------------------
+function fmt(v, d=2){
+  if (v === null || v === undefined || Number.isNaN(v)) return "–";
+  return Number(v).toLocaleString(undefined, {minimumFractionDigits:d, maximumFractionDigits:d});
+}
+function signCls(v){ return v>0 ? "up" : v<0 ? "down" : "flat"; }
+function pctText(v){ if(v===null||v===undefined) return ""; return (v>0?"+":"")+v.toFixed(2)+"%"; }
+
+// ---- tiny inline sparkline (SVG, numbers only) ------------------------------
+function sparkline(vals){
+  const w=150, h=26, pad=2;
+  const nums = (vals||[]).filter(x=>typeof x==="number");
+  const svgNS="http://www.w3.org/2000/svg";
+  const svg=document.createElementNS(svgNS,"svg");
+  svg.setAttribute("class","spark"); svg.setAttribute("viewBox",`0 0 ${w} ${h}`);
+  svg.setAttribute("preserveAspectRatio","none");
+  if(nums.length<2) return svg;
+  const min=Math.min(...nums), max=Math.max(...nums), span=(max-min)||1;
+  const up = nums[nums.length-1] >= nums[0];
+  const pts = nums.map((v,i)=>{
+    const x = pad + i*(w-2*pad)/(nums.length-1);
+    const y = h-pad - (v-min)/span*(h-2*pad);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const pl=document.createElementNS(svgNS,"polyline");
+  pl.setAttribute("points",pts); pl.setAttribute("fill","none");
+  pl.setAttribute("stroke", up ? css("--up") : css("--down"));
+  pl.setAttribute("stroke-width","1.6"); pl.setAttribute("stroke-linejoin","round");
+  pl.setAttribute("stroke-linecap","round");
+  svg.appendChild(pl);
+  return svg;
+}
+
+function tile(q){
+  const el=document.createElement("div"); el.className="tile";
+  const name=document.createElement("div"); name.className="name"; name.textContent=q.label;
+  const val=document.createElement("div"); val.className="val";
+  val.textContent=(q.unit==="₩"||q.unit==="$"?q.unit:"")+fmt(q.value,q.decimals)+(q.unit==="%"?"%":"");
+  const row=document.createElement("div"); row.className="row";
+  const chg=document.createElement("span"); chg.className="chg "+signCls(q.change_pct??0);
+  chg.textContent=pctText(q.change_pct)||"–";
+  row.appendChild(chg);
+  const foot=document.createElement("div"); foot.className="foot";
+  foot.textContent=(q.week_pct!=null?("7d "+pctText(q.week_pct)):"")+"  ·  "+q.asof;
+  el.append(name,val,row,sparkline(q.spark),foot);
+  return el;
+}
+
+function tileGrid(keys){
+  const g=document.createElement("div"); g.className="tiles";
+  keys.forEach(k=>{ const q=DATA.quotes[k]; if(q) g.appendChild(tile(q)); });
+  return g;
+}
+
+// ---- Plotly helpers ---------------------------------------------------------
+function baseLayout(extra={}){
+  const ink=css("--ink"), ink2=css("--ink-2"), grid=css("--grid"), surf=css("--surface");
+  return Object.assign({
+    paper_bgcolor:surf, plot_bgcolor:surf,
+    font:{family:'system-ui,-apple-system,"Segoe UI",sans-serif', color:ink2, size:12},
+    margin:{l:48,r:16,t:14,b:38},
+    xaxis:{gridcolor:grid, zeroline:false, linecolor:css("--axis"), tickfont:{color:css("--muted")}},
+    yaxis:{gridcolor:grid, zeroline:false, linecolor:css("--axis"), tickfont:{color:css("--muted")}},
+    legend:{orientation:"h", y:-0.18, font:{color:ink2}},
+    hovermode:"x unified",
+    colorway:[css("--s1"),css("--s2"),css("--s3"),css("--s4")],
+  }, extra);
+}
+const PLOTCFG={responsive:true, displaylogo:false,
+  modeBarButtonsToRemove:["lasso2d","select2d","autoScale2d","toggleSpikelines"]};
+
+function lineChart(node, series, {rebased=true}={}){
+  if(!series||!series.dates||!series.indexed){ node.innerHTML='<div class="skeleton">No series data.</div>'; return; }
+  const src = rebased ? series.indexed : series.raw;
+  const traces=Object.keys(src).map(name=>({
+    type:"scatter", mode:"lines", name, x:series.dates, y:src[name],
+    line:{width:2, shape:"spline", smoothing:0.4},
+    hovertemplate:"%{y:.2f}<extra>"+name+"</extra>",
+  }));
+  const lay=baseLayout({yaxis:{gridcolor:css("--grid"), zeroline:false,
+    linecolor:css("--axis"), tickfont:{color:css("--muted")},
+    title:{text: rebased?"Indexed to 100 at window start":"", font:{size:11,color:css("--muted")}}}});
+  Plotly.react(node, traces, lay, PLOTCFG);
+}
+
+function yieldCurve(node, curve){
+  if(!curve){ node.innerHTML='<div class="skeleton">No yield-curve data.</div>'; return; }
+  const x=curve.maturities;
+  const mk=(y,name,dash,color,width)=>({type:"scatter",mode:"lines+markers",name,x,y,
+    connectgaps:true, line:{width,dash,color,shape:"spline",smoothing:0.5},
+    marker:{size:7,color}, hovertemplate:"%{x}: %{y:.3f}%<extra>"+name+"</extra>"});
+  const traces=[];
+  if(curve.month_ago && curve.month_ago.some(v=>v!=null)) traces.push(mk(curve.month_ago,"~1 month ago","dot",css("--muted"),1.5));
+  if(curve.week_ago && curve.week_ago.some(v=>v!=null))  traces.push(mk(curve.week_ago,"~1 week ago","dash",css("--s2"),1.8));
+  traces.push(mk(curve.today,"Today","solid",css("--s1"),2.6));
+  const lay=baseLayout({hovermode:"closest",
+    yaxis:{gridcolor:css("--grid"),zeroline:false,linecolor:css("--axis"),
+      tickfont:{color:css("--muted")}, ticksuffix:"%",
+      title:{text:"Yield",font:{size:11,color:css("--muted")}}},
+    xaxis:{type:"category",gridcolor:css("--grid"),zeroline:false,linecolor:css("--axis"),
+      tickfont:{color:css("--muted")}, title:{text:"Maturity",font:{size:11,color:css("--muted")}}}});
+  Plotly.react(node, traces, lay, PLOTCFG);
+}
+
+function sectorMap(node, sectors){
+  const rows=(sectors||[]).filter(s=>s.change_pct!=null);
+  if(!rows.length){ node.innerHTML='<div class="skeleton">No sector data.</div>'; return; }
+  const maxAbs=Math.max(0.3, ...rows.map(s=>Math.abs(s.change_pct)));
+  const colorscale=[[0,css("--down")],[0.5,css("--neutral")],[1,css("--up")]];
+  const labels=rows.map(s=>s.name);
+  const text=rows.map(s=>(s.change_pct>0?"+":"")+s.change_pct.toFixed(2)+"%");
+  const trace={type:"treemap", branchvalues:"total",
+    labels:labels, parents:rows.map(()=>""), values:rows.map(()=>1),
+    text:text, texttemplate:"<b>%{label}</b><br>%{text}", textposition:"middle center",
+    marker:{colors:rows.map(s=>s.change_pct), colorscale, cmid:0, cmin:-maxAbs, cmax:maxAbs,
+      line:{width:2, color:css("--surface")}},
+    hovertemplate:"%{label}<br>Day %{text}<extra></extra>", tiling:{pad:2}};
+  const lay=baseLayout({margin:{l:6,r:6,t:6,b:6}});
+  Plotly.react(node, [trace], lay, PLOTCFG);
+}
+
+// ---- render -----------------------------------------------------------------
+function h(tag, cls, txt){ const e=document.createElement(tag); if(cls)e.className=cls; if(txt!=null)e.textContent=txt; return e; }
+function chartCard(){ const c=h("div","card"); const d=h("div","chart"); c.appendChild(d); return {card:c, node:d}; }
+function sectionEl(title, note){
+  const s=h("section"); s.appendChild(h("h2",null,title));
+  if(note){ const p=h("p","sec-note"); p.textContent=note; s.appendChild(p); }
+  return s;
+}
+
+function render(data){
+  DATA=data;
+  $("#updated").textContent = "updated "+(data.generated_at_kst||data.generated_at||"");
+  $("#src").textContent = data.source || "Yahoo Finance";
+
+  // data notes
+  const notes=$("#notes"); const errs=data.errors||[];
+  if(errs.length){ notes.hidden=false; $("#notes-count").textContent=errs.length;
+    const ul=$("#notes-list"); ul.innerHTML="";
+    errs.forEach(e=>{ const li=document.createElement("li"); li.textContent=e; ul.appendChild(li); });
+  } else notes.hidden=true;
+
+  const app=$("#app"); app.innerHTML="";
+  const charts=[];  // {fn, node, arg}
+
+  // === GLOBAL ===============================================================
+  const g=sectionEl("Global markets", "Bond yields, the dollar, FX, commodities and major equity indices.");
+  g.appendChild(h("h3",null,"Major equity indices"));
+  g.appendChild(tileGrid(data.groups.global_indices||[]));
+  const gi=chartCard(); g.appendChild(gi.card); charts.push([lineChart, gi.node, data.series.global_indices, {rebased:true}]);
+
+  g.appendChild(h("h3",null,"FX & the US dollar"));
+  g.appendChild(tileGrid(data.groups.fx_dollar||[]));
+  g.appendChild(h("h3",null,"Commodities"));
+  g.appendChild(tileGrid(data.groups.commodities||[]));
+  g.appendChild(h("h3",null,"Global 10-year government bond yields"));
+  g.appendChild(tileGrid(data.groups.global_bonds||[]));
+
+  if(data.yield_curves && data.yield_curves.US){
+    g.appendChild(h("h3",null,"US Treasury yield curve — shape & recent shift"));
+    const yc=chartCard(); g.appendChild(yc.card); charts.push([yieldCurve, yc.node, data.yield_curves.US]);
+  }
+  app.appendChild(g);
+
+  // === KOREA ================================================================
+  const k=sectionEl("Korea", "KOSPI, KOSDAQ and the large-cap KOSPI 200 / KOSDAQ 150 baskets.");
+  k.appendChild(h("h3",null,"Korean equity indices"));
+  k.appendChild(tileGrid(data.groups.korea_indices||[]));
+  const ki=chartCard(); k.appendChild(ki.card); charts.push([lineChart, ki.node, data.series.korea_indices, {rebased:true}]);
+  if(data.yield_curves && data.yield_curves.KR){
+    k.appendChild(h("h3",null,"Korea Treasury bond (KTB) yield curve — shape & recent shift"));
+    const yc=chartCard(); k.appendChild(yc.card); charts.push([yieldCurve, yc.node, data.yield_curves.KR]);
+  } else {
+    const p=h("p","sec-note","Korean government yield curve is available when a free Bank-of-Korea ECOS API key is configured (ECOS_API_KEY). See the repository README.");
+    k.appendChild(p);
+  }
+  app.appendChild(k);
+
+  // === SECTOR MAPS ==========================================================
+  const s=sectionEl("Sector maps", "Daily performance by industry group. Tile color = day move (red up / blue down); label shows the exact %.");
+  const grid=h("div","grid2");
+  const uc=h("div","card"); uc.appendChild(h("h3",null,"US — S&P 500 sectors (SPDR)")); const un=h("div","chart"); uc.appendChild(un);
+  const kc=h("div","card"); kc.appendChild(h("h3",null,"Korea — KOSPI/KOSDAQ sectors (KODEX)")); const kn=h("div","chart"); kc.appendChild(kn);
+  grid.append(uc,kc); s.appendChild(grid);
+  const leg=h("div","legend-note");
+  leg.innerHTML='<span><span class="swatch" style="background:var(--up)"></span>rising</span>'+
+                '<span><span class="swatch" style="background:var(--neutral)"></span>flat</span>'+
+                '<span><span class="swatch" style="background:var(--down)"></span>falling</span>';
+  s.appendChild(leg);
+  app.appendChild(s);
+  charts.push([sectorMap, un, data.sectors.US]);
+  charts.push([sectorMap, kn, data.sectors.KR]);
+
+  // draw all charts after layout
+  requestAnimationFrame(()=>charts.forEach(c=>c[0](c[1], c[2], c[3])));
+}
+
+// ---- data load --------------------------------------------------------------
+async function loadData(){
+  const r=await fetch("./data.json?cb="+Date.now(), {cache:"no-store"});
+  if(!r.ok) throw new Error("data.json "+r.status);
+  return r.json();
+}
+
+// ---- refresh via workflow_dispatch -----------------------------------------
+function setStatus(msg, isErr=false, spin=false){
+  const el=$("#status"); el.className=isErr?"err":"";
+  el.innerHTML=(spin?'<span class="dot"></span>':'')+ (msg||"");
+}
+function gh(path, opts={}){
+  const token=localStorage.getItem(TOKEN_KEY);
+  return fetch("https://api.github.com"+path, Object.assign({}, opts, {
+    headers:Object.assign({
+      "Accept":"application/vnd.github+json",
+      "X-GitHub-Api-Version":"2022-11-28",
+      "Authorization":"Bearer "+token,
+    }, opts.headers||{})
+  }));
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function doRefresh(){
+  const token=localStorage.getItem(TOKEN_KEY);
+  if(!token){ openModal(); return; }
+  const btn=$("#refresh-btn"); btn.disabled=true;
+  try{
+    setStatus("Requesting a fresh run…", false, true);
+    const t0=Date.now();
+    const disp=await gh(`/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/dispatches`,
+      {method:"POST", body:JSON.stringify({ref:REF})});
+    if(disp.status===401){ localStorage.removeItem(TOKEN_KEY); setStatus("Token rejected. Add it again.", true); openModal(); return; }
+    if(disp.status===403){ setStatus("Token lacks Actions:write on this repo.", true); return; }
+    if(disp.status===404){ setStatus("Workflow not found. Is the Action pushed to "+REF+"?", true); return; }
+    if(disp.status!==204){ setStatus("Dispatch failed ("+disp.status+").", true); return; }
+
+    // find the run we just triggered
+    let run=null;
+    for(let i=0;i<12 && !run;i++){
+      await sleep(2500);
+      const rr=await gh(`/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/runs?event=workflow_dispatch&per_page=5`);
+      if(rr.ok){ const j=await rr.json();
+        run=(j.workflow_runs||[]).find(w=>new Date(w.created_at).getTime() >= t0-90000) || null; }
+      setStatus("Queued…", false, true);
+    }
+    // poll run to completion
+    if(run){
+      for(let i=0;i<160;i++){
+        const rr=await gh(`/repos/${OWNER}/${REPO}/actions/runs/${run.id}`);
+        if(rr.ok){ const w=await rr.json();
+          if(w.status==="completed"){
+            if(w.conclusion!=="success"){ setStatus("Run finished: "+w.conclusion+".", true); break; }
+            break;
+          }
+          setStatus((w.status==="in_progress"?"Gathering data…":"Queued…"), false, true);
+        }
+        await sleep(4000);
+      }
+    } else {
+      setStatus("Run started — waiting for new data…", false, true);
+    }
+
+    // wait for Pages to publish the new data.json
+    setStatus("Publishing…", false, true);
+    const before=DATA && DATA.generated_at;
+    for(let i=0;i<30;i++){
+      await sleep(4000);
+      try{ const d=await loadData();
+        if(!before || d.generated_at!==before){ render(d); setStatus("Updated ✓ "+(d.generated_at_kst||"")); btn.disabled=false; return; }
+      }catch(e){}
+    }
+    setStatus("Run done; new data still publishing — reload shortly.", false);
+  }catch(err){
+    setStatus("Refresh error: "+err.message, true);
+  }finally{
+    $("#refresh-btn").disabled=false;
+  }
+}
+
+// ---- modal ------------------------------------------------------------------
+function openModal(){ $("#token-input").value=""; $("#modal").classList.add("open"); $("#token-input").focus(); }
+function closeModal(){ $("#modal").classList.remove("open"); }
+function saveToken(){
+  const v=$("#token-input").value.trim();
+  if(!v){ return; }
+  localStorage.setItem(TOKEN_KEY, v);
+  $("#forget-token").hidden=false;
+  closeModal(); doRefresh();
+}
+
+// ---- boot -------------------------------------------------------------------
+function wire(){
+  $("#theme-btn").addEventListener("click", toggleTheme);
+  $("#refresh-btn").addEventListener("click", doRefresh);
+  $("#modal-cancel").addEventListener("click", closeModal);
+  $("#modal-save").addEventListener("click", saveToken);
+  $("#token-input").addEventListener("keydown", e=>{ if(e.key==="Enter") saveToken(); });
+  $("#modal").addEventListener("click", e=>{ if(e.target.id==="modal") closeModal(); });
+  const forget=$("#forget-token");
+  if(localStorage.getItem(TOKEN_KEY)) forget.hidden=false;
+  forget.addEventListener("click", e=>{ e.preventDefault(); localStorage.removeItem(TOKEN_KEY); forget.hidden=true; setStatus("Saved token removed."); });
+  window.addEventListener("resize", ()=>{ if(DATA) document.querySelectorAll(".chart").forEach(n=>{ try{Plotly.Plots.resize(n);}catch(e){} }); });
+}
+
+initTheme();
+wire();
+loadData()
+  .then(render)
+  .catch(err=>{ $("#app").innerHTML='<div class="skeleton">Could not load data.json ('+err.message+
+    ').<br>Run the workflow once (Actions → Refresh market data → Run workflow, or the Refresh button) to generate it.</div>'; });
+</script>
+</body>
+</html>
