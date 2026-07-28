@@ -73,18 +73,20 @@ US_YIELD_CURVE = [
 ]
 
 # --- US sector map (SPDR Select Sector ETFs) ------------------------------
+# ``ticker`` (the SPDR ETF) drives the daily % change / color; ``yf_sector``
+# (a Yahoo sector key) drives the tile AREA via the sector's total market cap.
 US_SECTORS = [
-    {"name": "Technology",         "ticker": "XLK"},
-    {"name": "Financials",         "ticker": "XLF"},
-    {"name": "Health Care",        "ticker": "XLV"},
-    {"name": "Cons. Discretionary","ticker": "XLY"},
-    {"name": "Communication Svcs", "ticker": "XLC"},
-    {"name": "Industrials",        "ticker": "XLI"},
-    {"name": "Cons. Staples",      "ticker": "XLP"},
-    {"name": "Energy",             "ticker": "XLE"},
-    {"name": "Utilities",          "ticker": "XLU"},
-    {"name": "Materials",          "ticker": "XLB"},
-    {"name": "Real Estate",        "ticker": "XLRE"},
+    {"name": "Technology",         "ticker": "XLK",  "yf_sector": "technology"},
+    {"name": "Financials",         "ticker": "XLF",  "yf_sector": "financial-services"},
+    {"name": "Health Care",        "ticker": "XLV",  "yf_sector": "healthcare"},
+    {"name": "Cons. Discretionary","ticker": "XLY",  "yf_sector": "consumer-cyclical"},
+    {"name": "Communication Svcs", "ticker": "XLC",  "yf_sector": "communication-services"},
+    {"name": "Industrials",        "ticker": "XLI",  "yf_sector": "industrials"},
+    {"name": "Cons. Staples",      "ticker": "XLP",  "yf_sector": "consumer-defensive"},
+    {"name": "Energy",             "ticker": "XLE",  "yf_sector": "energy"},
+    {"name": "Utilities",          "ticker": "XLU",  "yf_sector": "utilities"},
+    {"name": "Materials",          "ticker": "XLB",  "yf_sector": "basic-materials"},
+    {"name": "Real Estate",        "ticker": "XLRE", "yf_sector": "real-estate"},
 ]
 
 # --- Korea sector map (KODEX sector ETFs as proxies) ----------------------
