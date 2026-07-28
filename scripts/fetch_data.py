@@ -229,12 +229,14 @@ def build_us_curve(closes: dict) -> dict | None:
     return {"maturities": mats, "today": today, "week_ago": wk, "month_ago": mo, "asof": asof}
 
 
-def sector_market_cap(sec: dict) -> float | None:
-    """Total market cap for a sector, used to size the treemap tile.
+def sector_tile_size(sec: dict) -> float | None:
+    """A size for the treemap tile so its AREA reflects the sector's weight.
 
-    US sectors: the real sector market cap from Yahoo's sector data. Korean
-    sectors: KRX publishes no free per-sector market cap, so the KODEX ETF's
-    fund AUM (net assets) stands in as a size proxy.
+    US sectors: the real sector total market cap from Yahoo's sector data.
+    Korean sectors: KRX publishes no free per-sector market cap, and Yahoo's
+    fund-info (quoteSummary) endpoint is blocked on CI, so the KODEX ETF's
+    average daily trading value (close x volume, from the reliable chart
+    endpoint) stands in as a liquidity-weighted size proxy.
     """
     key = sec.get("yf_sector")
     try:
@@ -242,11 +244,16 @@ def sector_market_cap(sec: dict) -> float | None:
             overview = yf.Sector(key, session=SESSION).overview or {}
             mc = overview.get("market_cap")
             return float(mc) if mc else None
-        info = yf.Ticker(sec["ticker"], session=SESSION).get_info() or {}
-        aum = info.get("totalAssets") or info.get("netAssets")
-        return float(aum) if aum else None
+        hist = yf.Ticker(sec["ticker"], session=SESSION).history(
+            period="1mo", auto_adjust=False)
+        if hist is not None and not hist.empty and "Volume" in hist and "Close" in hist:
+            tv = (hist["Close"] * hist["Volume"]).tail(20)
+            tv = tv[tv > 0]
+            if len(tv):
+                return float(tv.median())
+        return None
     except Exception as exc:
-        note_error(f"market cap for {sec['name']} ({sec.get('yf_sector') or sec['ticker']}): {exc}")
+        note_error(f"tile size for {sec['name']} ({sec.get('yf_sector') or sec['ticker']}): {exc}")
         return None
 
 
@@ -265,7 +272,7 @@ def build_sectors(sector_list: list, closes: dict) -> list:
             "price": round(last, 2),
             "change_pct": pct(last, prev),
             "week_pct": pct(last, float(s.iloc[-6]) if len(s) >= 6 else float(s.iloc[0])),
-            "market_cap": sector_market_cap(sec),
+            "market_cap": sector_tile_size(sec),
         })
     return out
 
@@ -371,8 +378,8 @@ def main() -> int:
         data["yield_curves"]["KR"] = kr_curve
 
     data["sector_basis"] = {
-        "US": {"label": "Tile area ∝ sector total market cap", "currency": "$"},
-        "KR": {"label": "Tile area ∝ ETF fund AUM (proxy)", "currency": "₩"},
+        "US": {"label": "Tile area ∝ sector total market cap", "currency": "$", "metric": "Mkt cap"},
+        "KR": {"label": "Tile area ∝ avg. daily trading value (proxy)", "currency": "₩", "metric": "Trad. value"},
     }
 
     data["errors"] = ERRORS
