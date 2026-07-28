@@ -229,6 +229,27 @@ def build_us_curve(closes: dict) -> dict | None:
     return {"maturities": mats, "today": today, "week_ago": wk, "month_ago": mo, "asof": asof}
 
 
+def sector_market_cap(sec: dict) -> float | None:
+    """Total market cap for a sector, used to size the treemap tile.
+
+    US sectors: the real sector market cap from Yahoo's sector data. Korean
+    sectors: KRX publishes no free per-sector market cap, so the KODEX ETF's
+    fund AUM (net assets) stands in as a size proxy.
+    """
+    key = sec.get("yf_sector")
+    try:
+        if key:
+            overview = yf.Sector(key, session=SESSION).overview or {}
+            mc = overview.get("market_cap")
+            return float(mc) if mc else None
+        info = yf.Ticker(sec["ticker"], session=SESSION).get_info() or {}
+        aum = info.get("totalAssets") or info.get("netAssets")
+        return float(aum) if aum else None
+    except Exception as exc:
+        note_error(f"market cap for {sec['name']} ({sec.get('yf_sector') or sec['ticker']}): {exc}")
+        return None
+
+
 def build_sectors(sector_list: list, closes: dict) -> list:
     out = []
     for sec in sector_list:
@@ -244,6 +265,7 @@ def build_sectors(sector_list: list, closes: dict) -> list:
             "price": round(last, 2),
             "change_pct": pct(last, prev),
             "week_pct": pct(last, float(s.iloc[-6]) if len(s) >= 6 else float(s.iloc[0])),
+            "market_cap": sector_market_cap(sec),
         })
     return out
 
@@ -347,6 +369,11 @@ def main() -> int:
     kr_curve = build_kr_curve()
     if kr_curve:
         data["yield_curves"]["KR"] = kr_curve
+
+    data["sector_basis"] = {
+        "US": {"label": "Tile area ∝ sector total market cap", "currency": "$"},
+        "KR": {"label": "Tile area ∝ ETF fund AUM (proxy)", "currency": "₩"},
+    }
 
     data["errors"] = ERRORS
 

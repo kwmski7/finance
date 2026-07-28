@@ -303,19 +303,42 @@ function yieldCurve(node, curve){
   Plotly.react(node, traces, lay, PLOTCFG);
 }
 
-function sectorMap(node, sectors){
+function bigMoney(v, cur){
+  if(v==null||isNaN(v)) return "n/a";
+  const a=Math.abs(v);
+  if(cur==="₩"){
+    if(a>=1e12) return "₩"+(v/1e12).toFixed(2)+"조";
+    if(a>=1e8)  return "₩"+(v/1e8).toFixed(1)+"억";
+    return "₩"+Math.round(v).toLocaleString();
+  }
+  if(a>=1e12) return "$"+(v/1e12).toFixed(2)+"T";
+  if(a>=1e9)  return "$"+(v/1e9).toFixed(1)+"B";
+  if(a>=1e6)  return "$"+(v/1e6).toFixed(1)+"M";
+  return "$"+Math.round(v).toLocaleString();
+}
+
+function sectorMap(node, sectors, basis){
   const rows=(sectors||[]).filter(s=>s.change_pct!=null);
   if(!rows.length){ node.innerHTML='<div class="skeleton">No sector data.</div>'; return; }
+  const cur=(basis&&basis.currency)||"$";
+  // Tile AREA is proportional to market cap. Missing caps fall back to half the
+  // median so the tile still shows without dominating.
+  const caps=rows.map(s=>(typeof s.market_cap==="number"&&s.market_cap>0)?s.market_cap:null);
+  const present=caps.filter(c=>c!=null).sort((a,b)=>a-b);
+  const med=present.length?present[Math.floor(present.length/2)]:1;
+  const values=caps.map(c=>c!=null?c:med*0.5);
+  const capDisp=caps.map(c=>c!=null?bigMoney(c,cur):"n/a");
   const maxAbs=Math.max(0.3, ...rows.map(s=>Math.abs(s.change_pct)));
   const colorscale=[[0,css("--down")],[0.5,css("--neutral")],[1,css("--up")]];
-  const labels=rows.map(s=>s.name);
   const text=rows.map(s=>(s.change_pct>0?"+":"")+s.change_pct.toFixed(2)+"%");
   const trace={type:"treemap", branchvalues:"total",
-    labels:labels, parents:rows.map(()=>""), values:rows.map(()=>1),
-    text:text, texttemplate:"<b>%{label}</b><br>%{text}", textposition:"middle center",
+    labels:rows.map(s=>s.name), parents:rows.map(()=>""), values:values,
+    text:text, customdata:capDisp,
+    texttemplate:"<b>%{label}</b><br>%{text}", textposition:"middle center",
     marker:{colors:rows.map(s=>s.change_pct), colorscale, cmid:0, cmin:-maxAbs, cmax:maxAbs,
       line:{width:2, color:css("--surface")}},
-    hovertemplate:"%{label}<br>Day %{text}<extra></extra>", tiling:{pad:2}};
+    hovertemplate:"<b>%{label}</b><br>Day %{text}<br>Mkt cap %{customdata}<extra></extra>",
+    tiling:{pad:2}};
   const lay=baseLayout({margin:{l:6,r:6,t:6,b:6}});
   Plotly.react(node, [trace], lay, PLOTCFG);
 }
@@ -378,10 +401,13 @@ function render(data){
   app.appendChild(k);
 
   // === SECTOR MAPS ==========================================================
-  const s=sectionEl("Sector maps", "Daily performance by industry group. Tile color = day move (red up / blue down); label shows the exact %.");
+  const s=sectionEl("Sector maps", "Tile AREA ∝ total market cap; tile COLOR = day move (red up / blue down). Exact % on each tile, market cap on hover.");
+  const basis=data.sector_basis||{};
   const grid=h("div","grid2");
   const uc=h("div","card"); uc.appendChild(h("h3",null,"US — S&P 500 sectors (SPDR)")); const un=h("div","chart"); uc.appendChild(un);
+  const uCap=h("div","sec-note",(basis.US||{}).label||""); uCap.style.margin="8px 4px 0"; uc.appendChild(uCap);
   const kc=h("div","card"); kc.appendChild(h("h3",null,"Korea — KOSPI/KOSDAQ sectors (KODEX)")); const kn=h("div","chart"); kc.appendChild(kn);
+  const kCap=h("div","sec-note",(basis.KR||{}).label||""); kCap.style.margin="8px 4px 0"; kc.appendChild(kCap);
   grid.append(uc,kc); s.appendChild(grid);
   const leg=h("div","legend-note");
   leg.innerHTML='<span><span class="swatch" style="background:var(--up)"></span>rising</span>'+
@@ -389,8 +415,8 @@ function render(data){
                 '<span><span class="swatch" style="background:var(--down)"></span>falling</span>';
   s.appendChild(leg);
   app.appendChild(s);
-  charts.push([sectorMap, un, data.sectors.US]);
-  charts.push([sectorMap, kn, data.sectors.KR]);
+  charts.push([sectorMap, un, data.sectors.US, basis.US]);
+  charts.push([sectorMap, kn, data.sectors.KR, basis.KR]);
 
   // draw all charts after layout
   requestAnimationFrame(()=>charts.forEach(c=>c[0](c[1], c[2], c[3])));
