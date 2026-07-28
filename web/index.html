@@ -321,6 +321,7 @@ function sectorMap(node, sectors, basis){
   const rows=(sectors||[]).filter(s=>s.change_pct!=null);
   if(!rows.length){ node.innerHTML='<div class="skeleton">No sector data.</div>'; return; }
   const cur=(basis&&basis.currency)||"$";
+  const metric=(basis&&basis.metric)||"Size";
   // Tile AREA is proportional to market cap. Missing caps fall back to half the
   // median so the tile still shows without dominating.
   const caps=rows.map(s=>(typeof s.market_cap==="number"&&s.market_cap>0)?s.market_cap:null);
@@ -337,7 +338,7 @@ function sectorMap(node, sectors, basis){
     texttemplate:"<b>%{label}</b><br>%{text}", textposition:"middle center",
     marker:{colors:rows.map(s=>s.change_pct), colorscale, cmid:0, cmin:-maxAbs, cmax:maxAbs,
       line:{width:2, color:css("--surface")}},
-    hovertemplate:"<b>%{label}</b><br>Day %{text}<br>Mkt cap %{customdata}<extra></extra>",
+    hovertemplate:"<b>%{label}</b><br>Day %{text}<br>"+metric+" %{customdata}<extra></extra>",
     tiling:{pad:2}};
   const lay=baseLayout({margin:{l:6,r:6,t:6,b:6}});
   Plotly.react(node, [trace], lay, PLOTCFG);
